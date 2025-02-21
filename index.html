@@ -11,25 +11,30 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f4f4f4;
+            background-color: #2d4a2d;
             text-align: center;
             font-family: Arial, sans-serif;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
+            color: #d4e157;
         }
         .container {
-            background: white;
+            background: #3b573b;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 0px 10px rgba(212, 225, 87, 0.5);
             width: 350px;
+            color: #d4e157;
         }
         select, input {
             width: 85%;
             padding: 10px;
             margin-top: 10px;
             font-size: 16px;
-            border: 1px solid #ccc;
+            border: 1px solid #d4e157;
             border-radius: 5px;
             text-align: center;
+            background: #2d4a2d;
+            color: #d4e157;
         }
         button {
             margin-top: 15px;
@@ -37,74 +42,69 @@
             font-size: 16px;
             cursor: pointer;
             border: none;
-            background-color: #007BFF;
-            color: white;
+            background-color: #d4e157;
+            color: #2d4a2d;
             border-radius: 5px;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #cddc39;
         }
         #output {
             margin-top: 20px;
             font-size: 18px;
             font-weight: bold;
-            color: #333;
+            color: #d4e157;
+        }
+        .logo {
+            width: 100px;
+            height: auto;
+            display: block;
+            margin: 0 auto 20px;
         }
     </style>
     <script>
-        let financialData = {}; // Object to store revenue and expenses
-
-        function updateFinance() {
-            let month = document.getElementById("monthSelect").value;
-            let revenue = parseFloat(document.getElementById("revenueInput").value) || 0;
-            let expenses = parseFloat(document.getElementById("expensesInput").value) || 0;
-
-            financialData[month] = {
-                revenue: revenue,
-                expenses: expenses,
-                profit: revenue - expenses
-            };
-            displayFinance();
-        }
-
-        function displayFinance() {
-            let output = "<h3>Monthly Finances:</h3>";
-            let totalProfit = 0;
-
-            for (let month in financialData) {
-                let data = financialData[month];
-                totalProfit += data.profit;
-                output += `<p>${month}: Revenue: $${data.revenue.toFixed(2)}, Expenses: $${data.expenses.toFixed(2)}, Profit: $${data.profit.toFixed(2)}</p>`;
+        function calculateTimeToSavingsGoal() {
+            let savingsGoal = parseFloat(document.getElementById("savingsGoal").value) || 0;
+            let monthlyIncome = parseFloat(document.getElementById("monthlyIncome").value) || 0;
+            let monthlyExpenses = parseFloat(document.getElementById("monthlyExpenses").value) || 0;
+            let disposableSpent = parseFloat(document.getElementById("disposableSpent").value) || 0;
+            let timeTarget = parseFloat(document.getElementById("timeTarget").value) || 1;
+            
+            let monthlyProfit = monthlyIncome - monthlyExpenses;
+            let monthsRequired = savingsGoal / monthlyProfit;
+            let neededSavingsRate = savingsGoal / timeTarget;
+            let requiredCut = neededSavingsRate - monthlyProfit;
+            
+            if (monthlyProfit > 0) {
+                requiredCut = Math.min(disposableSpent, Math.max(0, requiredCut));
+                document.getElementById("savingsOutput").innerHTML = `<h3>Savings Plan:</h3>
+                    <p>With a monthly profit of $${monthlyProfit.toFixed(2)}, it will take approximately ${Math.ceil(monthsRequired)} months to reach your savings goal of $${savingsGoal.toFixed(2)}.</p>
+                    <p>To meet your goal in ${timeTarget} months, you need to save at least $${neededSavingsRate.toFixed(2)} per month.</p>
+                    <p>You should consider cutting $${requiredCut.toFixed(2)} from your disposable income spending.</p>`;
+            } else {
+                document.getElementById("savingsOutput").innerHTML = `<h3>Savings Plan:</h3>
+                    <p>Your expenses exceed or match your income. Increase income or reduce expenses to save money.</p>`;
             }
-            output += `<h3>Total Profit: $${totalProfit.toFixed(2)}</h3>`;
-            document.getElementById("output").innerHTML = output;
         }
     </script>
 </head>
 <body>
     <div class="container">
+        <img src="/mnt/data/An_8-bit_pixel_art_logo_for_a_financial_tracker_we.png" alt="Financial Tracker Logo" class="logo">
         <h2>Track Your Monthly Finances</h2>
-        <select id="monthSelect">
-            <option value="January">January</option>
-            <option value="February">February</option>
-            <option value="March">March</option>
-            <option value="April">April</option>
-            <option value="May">May</option>
-            <option value="June">June</option>
-            <option value="July">July</option>
-            <option value="August">August</option>
-            <option value="September">September</option>
-            <option value="October">October</option>
-            <option value="November">November</option>
-            <option value="December">December</option>
-        </select>
+        <input type="number" id="monthlyIncome" placeholder="Enter estimated monthly income" step="0.01">
         <br>
-        <input type="number" id="revenueInput" placeholder="Enter revenue" step="0.01">
+        <input type="number" id="monthlyExpenses" placeholder="Enter constant monthly expenses" step="0.01">
         <br>
-        <input type="number" id="expensesInput" placeholder="Enter expenses" step="0.01">
+        <input type="number" id="disposableSpent" placeholder="Enter disposable income spent" step="0.01">
         <br>
-        <button onclick="updateFinance()">Submit</button>
-        <div id="output"></div>
+        <h2>Savings Suggestion</h2>
+        <input type="number" id="savingsGoal" placeholder="Enter total savings goal" step="0.01">
+        <br>
+        <input type="number" id="timeTarget" placeholder="Enter time target in months" step="1">
+        <br>
+        <button onclick="calculateTimeToSavingsGoal()">Calculate Time to Goal</button>
+        <div id="savingsOutput"></div>
     </div>
 </body>
 </html>
