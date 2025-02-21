@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monthly Financial Tracker</title>
+    <title>MoneyMogul - Monthly Financial Tracker</title>
     <style>
         body {
             display: flex;
@@ -17,52 +17,54 @@
             background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
             color: #d4e157;
         }
-        .container {
+        .container, .opening-screen {
             background: #3b573b;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(212, 225, 87, 0.5);
             width: 350px;
             color: #d4e157;
+            position: relative;
         }
-        select, input {
+        .logo {
+            width: 150px;
+            height: auto;
+            display: block;
+            margin: 0 auto 10px;
+        }
+        select, input, button {
             width: 85%;
             padding: 10px;
             margin-top: 10px;
             font-size: 16px;
-            border: 1px solid #d4e157;
             border-radius: 5px;
             text-align: center;
-            background: #2d4a2d;
-            color: #d4e157;
         }
         button {
-            margin-top: 15px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
             background-color: #d4e157;
             color: #2d4a2d;
-            border-radius: 5px;
+            border: none;
+            cursor: pointer;
         }
         button:hover {
             background-color: #cddc39;
         }
-        #output {
+        #savingsOutput {
             margin-top: 20px;
             font-size: 18px;
             font-weight: bold;
             color: #d4e157;
         }
-        .logo {
-            width: 100px;
-            height: auto;
-            display: block;
-            margin: 0 auto 20px;
+        .hidden {
+            display: none;
         }
     </style>
     <script>
+        function startApp() {
+            document.getElementById('openingScreen').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+        }
+        
         function calculateTimeToSavingsGoal() {
             let savingsGoal = parseFloat(document.getElementById("savingsGoal").value) || 0;
             let monthlyIncome = parseFloat(document.getElementById("monthlyIncome").value) || 0;
@@ -77,20 +79,26 @@
             
             if (monthlyProfit > 0) {
                 requiredCut = Math.min(disposableSpent, Math.max(0, requiredCut));
-                document.getElementById("savingsOutput").innerHTML = `<h3>Savings Plan:</h3>
+                document.getElementById("savingsOutput").innerHTML = `
                     <p>With a monthly profit of $${monthlyProfit.toFixed(2)}, it will take approximately ${Math.ceil(monthsRequired)} months to reach your savings goal of $${savingsGoal.toFixed(2)}.</p>
                     <p>To meet your goal in ${timeTarget} months, you need to save at least $${neededSavingsRate.toFixed(2)} per month.</p>
                     <p>You should consider cutting $${requiredCut.toFixed(2)} from your disposable income spending.</p>`;
             } else {
-                document.getElementById("savingsOutput").innerHTML = `<h3>Savings Plan:</h3>
+                document.getElementById("savingsOutput").innerHTML = `
                     <p>Your expenses exceed or match your income. Increase income or reduce expenses to save money.</p>`;
             }
         }
     </script>
 </head>
 <body>
-    <div class="container">
-        <img src="/mnt/data/An_8-bit_pixel_art_logo_for_a_financial_tracker_we.png" alt="Financial Tracker Logo" class="logo">
+    <div id="openingScreen" class="opening-screen">
+        <img src="https://i.postimg.cc/MfBRYFBd/financelogo.webp" alt="MoneyMogul Logo" class="logo">
+        <h1>MoneyMogul</h1>
+        <p>Welcome to MoneyMogul! Manage your finances wisely.</p>
+        <p>By continuing, you agree to our <a href="#">Terms of Service</a> and acknowledge our <a href="#">Disclaimer</a>.</p>
+        <button onclick="startApp()">Agree & Continue</button>
+    </div>
+    <div id="appContainer" class="container hidden">
         <h2>Track Your Monthly Finances</h2>
         <input type="number" id="monthlyIncome" placeholder="Enter estimated monthly income" step="0.01">
         <br>
