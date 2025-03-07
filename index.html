@@ -16,6 +16,7 @@
             font-family: Arial, sans-serif;
             background-image: url('https://www.transparenttextures.com/patterns/dark-wood.png');
             color: #d4e157;
+            position: relative;
         }
         .container, .opening-screen {
             background: #3b573b;
@@ -87,33 +88,185 @@
         .hidden {
             display: none;
         }
+
+        /* Positioning the buttons */
+        .button-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .button-container button {
+            width: 120px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .home-button, .goals-button {
+    background-color: #cddc39;
+    color: #2d4a2d;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.home-button:hover, .goals-button:hover {
+    background-color: #a9b71c;
+}
+
+
+        .button-container button:hover {
+            background-color: #a9b71c;
+        }
+
+        /* Style for the new "Track Long-Term Goals" screen */
+        .long-term-goals {
+            background: #3b573b; /* Same green box as the home screen */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(212, 225, 87, 0.5);
+            width: 500px;
+            color: #d4e157;
+            text-align: center;
+        }
+
+        .plus-button {
+            background-color: #d4e157;
+            color: #2d4a2d;
+            padding: 10px 20px;
+            border-radius: 50px; /* Thinner ellipse */
+            font-size: 24px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .plus-button:hover {
+            background-color: #cddc39;
+        }
+
+        /* New Long-Term Goal Input Styling */
+        .goal-input-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .goal-input-container input {
+            width: 80%;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .goal-input-container button {
+            margin-top: 10px;
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            margin-top: 20px;
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            width: 0%;
+            background-color: #d4e157;
+            border-radius: 5px;
+        }
+
+        /* Home Button Styling */
+        .home-button-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .home-button {
+    background-color: #d4e157;
+    color: #2d4a2d;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px; /* Match Goals button */
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+
+        .home-button:hover {
+            background-color: #cddc39;
+        }
+
     </style>
     <script>
         function startApp() {
             document.getElementById('openingScreen').classList.add('hidden');
             document.getElementById('appContainer').classList.remove('hidden');
         }
-        
+
         function calculateTimeToSavingsGoal() {
             let savingsGoal = parseFloat(document.getElementById("savingsGoal").value) || 0;
             let monthlyIncome = parseFloat(document.getElementById("monthlyIncome").value) || 0;
             let monthlyExpenses = parseFloat(document.getElementById("monthlyExpenses").value) || 0;
             let disposableSpent = parseFloat(document.getElementById("disposableSpent").value) || 0;
             let timeTarget = parseFloat(document.getElementById("timeTarget").value) || 1;
-            
+
             let monthlyProfit = monthlyIncome - monthlyExpenses;
             let monthsRequired = savingsGoal / monthlyProfit;
             let neededSavingsRate = savingsGoal / timeTarget;
             let requiredCut = neededSavingsRate - monthlyProfit;
-            
-            let output = `<img src="https://i.postimg.cc/7hZ8ZTSC/Buesiness-man-8bit.webp" alt="8-bit Businessman" class="character">
-                <div class="speech-bubble">
-                    <p><strong>With a monthly profit of $${monthlyProfit.toFixed(2)},</strong> it will take approximately <strong>${Math.ceil(monthsRequired)} months</strong> to reach your savings goal of <strong>$${savingsGoal.toFixed(2)}</strong>.</p>
-                    <p>To meet your goal in <strong>${timeTarget} months</strong>, you need to save at least <strong>$${neededSavingsRate.toFixed(2)}</strong> per month.</p>
-                    <p>You should consider cutting <strong>$${requiredCut.toFixed(2)}</strong> from your disposable income spending.</p>
-                </div>`;
-            
+
+            let output = '<img src="https://i.postimg.cc/7hZ8ZTSC/Buesiness-man-8bit.webp" alt="8-bit Businessman" class="character">' +
+                '<div class="speech-bubble">' +
+                    '<p><strong>With a monthly profit of $' + monthlyProfit.toFixed(2) + ',</strong> it will take approximately <strong>' + Math.ceil(monthsRequired) + ' months</strong> to reach your savings goal of <strong>$' + savingsGoal.toFixed(2) + '</strong>.</p>' +
+                    '<p>To meet your goal in <strong>' + timeTarget + ' months</strong>, you need to save at least <strong>$' + neededSavingsRate.toFixed(2) + '</strong> per month.</p>' +
+                    '<p>You should consider cutting <strong>$' + requiredCut.toFixed(2) + '</strong> from your disposable income spending.</p>' +
+                '</div>';
+
             document.getElementById("savingsOutput").innerHTML = output;
+        }
+
+        function showGoalsScreen() {
+            document.getElementById('appContainer').classList.add('hidden');
+            document.getElementById('longTermGoalsContainer').classList.remove('hidden');
+        }
+
+        function showHomeScreen() {
+            document.getElementById('longTermGoalsContainer').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+        }
+
+        function addGoal() {
+            var goalName = document.getElementById("goalName").value;
+            if (goalName) {
+                document.getElementById('goalInputContainer').style.display = "none";
+                var goalDisplayContainer = document.getElementById('longTermGoalsContainer');
+                goalDisplayContainer.innerHTML =  
+                    '<h2>Track Your Long-Term Goals</h2>' +
+                    '<p><strong>' + goalName + '</strong></p>' +
+                    '<div class="progress-bar-container">' +
+                        '<div class="progress-bar" style="width: 0%"></div>' +
+                    '</div>';
+            }
+        }
+
+        function showGoalInput() {
+            document.getElementById('goalInputContainer').style.display = "block";
+            document.getElementById('plusButton').style.display = "none"; // Hide the plus button
         }
     </script>
 </head>
@@ -125,6 +278,7 @@
         <p>By continuing, you agree to our <a href="#">Terms of Service</a> and acknowledge our <a href="#">Disclaimer</a>.</p>
         <button onclick="startApp()">Agree & Continue</button>
     </div>
+
     <div id="appContainer" class="container hidden">
         <h2>Track Your Monthly Finances</h2>
         <input type="number" id="monthlyIncome" placeholder="Enter estimated monthly income" step="0.01">
@@ -140,6 +294,30 @@
         <br>
         <button onclick="calculateTimeToSavingsGoal()">Calculate Time to Goal</button>
         <div id="savingsOutput"></div>
+    </div>
+
+    <!-- Long-Term Goals Screen -->
+    <div id="longTermGoalsContainer" class="long-term-goals hidden">
+        <h2>Track Your Long-Term Goals</h2>
+        <button id="plusButton" class="plus-button" onclick="showGoalInput()">+</button>
+
+        <!-- Goal Input Form -->
+        <div id="goalInputContainer" class="goal-input-container">
+            <p>State your Long Term Goal:</p>
+            <input type="text" id="goalName" placeholder="Enter your goal">
+            <br>
+            <button onclick="addGoal()">Add Goal</button>
+        </div>
+    </div>
+
+    <!-- Buttons for Goals -->
+    <div class="button-container">
+        <button class="goals-button" onclick="showGoalsScreen()">Goals</button>
+    </div>
+
+    <!-- Home Button -->
+    <div class="home-button-container">
+        <button class="home-button" onclick="showHomeScreen()">Home</button>
     </div>
 </body>
 </html>
