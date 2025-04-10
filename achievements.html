@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - MoneyMogul</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>Achievements - MoneyMogul</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,24 +12,25 @@
       padding: 20px;
     }
     .container {
-      max-width: 600px;
+      max-width: 700px;
       margin: auto;
       background: #3b573b;
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(212, 225, 87, 0.5);
     }
-    input, button {
-      width: 100%;
-      margin: 10px 0;
+    .achievement, .goal-entry, .history-entry {
+      background-color: #fff;
+      color: #000;
       padding: 10px;
+      margin: 10px 0;
       border-radius: 5px;
-      border: none;
     }
-    button {
-      background-color: #d4e157;
-      color: #2d4a2d;
-      font-weight: bold;
+    .badge {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+      vertical-align: middle;
     }
     nav a {
       color: #d4e157;
@@ -38,18 +38,9 @@
       text-decoration: none;
       font-weight: bold;
     }
-    .expense-item {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .expense-item input {
-      flex: 1;
-    }
-    canvas {
-      background-color: #fff;
-      border-radius: 10px;
-      margin-top: 20px;
+    h3 {
+      border-bottom: 1px solid #d4e157;
+      padding-bottom: 4px;
     }
   </style>
 </head>
@@ -62,110 +53,50 @@
   </nav>
 
   <div class="container">
-    <h1>Monthly Financial Tracker</h1>
-    <input type="number" id="income" placeholder="Monthly Income">
+    <h1>Achievements</h1>
+    <div id="achievementList"></div>
 
-    <div id="expenseList"></div>
-    <button onclick="addExpenseField()">+ Add Expense</button>
+    <h3>✅ Completed Goals</h3>
+    <div id="completedGoals"></div>
 
-    <input type="number" id="goal" placeholder="Savings Goal">
-    <input type="number" id="months" placeholder="Target Time (months)">
-    <button onclick="calculateAdvice()">Get Advice</button>
-    <div id="output"></div>
-    <canvas id="savingsChart" width="400" height="200"></canvas>
+    <h3>📈 Savings History</h3>
+    <div id="savingsHistory"></div>
   </div>
 
   <script>
-    if (!localStorage.getItem('currentUser')) {
-      window.location.href = 'index.html';
+    if (!localStorage.getItem('currentUser')) window.location.href = 'index.html';
+    function logout() { localStorage.removeItem('currentUser'); }
+
+    const completedGoals = JSON.parse(localStorage.getItem('completedGoals')) || [];
+    const goalData = JSON.parse(localStorage.getItem('goals')) || [];
+    const finances = JSON.parse(localStorage.getItem('finances')) || { history: {}, totalSaved: 0 };
+
+    const achievements = [];
+    const completeGoalCount = completedGoals.length;
+
+    if (completeGoalCount >= 1) achievements.push({ text: "🏆 First Goal Achieved!", badge: "https://img.icons8.com/emoji/48/trophy-emoji.png" });
+    if (completeGoalCount >= 3) achievements.push({ text: "🎯 Triple Goal Master!", badge: "https://img.icons8.com/emoji/48/check-mark-emoji.png" });
+    if (goalData.length >= 5) achievements.push({ text: "📘 Long-Term Visionary", badge: "https://img.icons8.com/emoji/48/star-emoji.png" });
+    if (finances.totalSaved >= 500) achievements.push({ text: "💵 Saved $500!", badge: "https://img.icons8.com/color/48/money.png" });
+    if (finances.totalSaved >= 1000) achievements.push({ text: "💰 Saved $1,000!", badge: "https://img.icons8.com/color/48/banknotes.png" });
+    if (finances.totalSaved >= 5000) achievements.push({ text: "🏦 Saved $5,000!", badge: "https://img.icons8.com/color/48/safe.png" });
+
+    const list = document.getElementById('achievementList');
+    list.innerHTML = achievements.length === 0 ? '<p>No achievements yet. Keep going!</p>' :
+      achievements.map(a => `<div class='achievement'><img class='badge' src='${a.badge}' alt='badge'>${a.text}</div>`).join('');
+
+    const completedContainer = document.getElementById('completedGoals');
+    completedContainer.innerHTML = completedGoals.length === 0 ? '<p>No goals completed yet.</p>' :
+      completedGoals.map(name => `<div class='goal-entry'>🎯 ${name} — ✅ Completed</div>`).join('');
+
+    const historyContainer = document.getElementById('savingsHistory');
+    const history = finances.history || {};
+    if (Object.keys(history).length === 0) {
+      historyContainer.innerHTML = '<p>No savings data yet.</p>';
+    } else {
+      const sorted = Object.entries(history).sort();
+      historyContainer.innerHTML = sorted.map(([month, amount]) => `<div class='history-entry'>📅 ${month} — 💸 $${amount.toFixed(2)}</div>`).join('');
     }
-
-    function logout() {
-      localStorage.removeItem('currentUser');
-    }
-
-    function addExpenseField() {
-      const container = document.getElementById("expenseList");
-      const row = document.createElement("div");
-      row.classList.add("expense-item");
-      row.innerHTML = `
-        <input type="text" placeholder="Expense Name">
-        <input type="number" placeholder="Amount">
-      `;
-      container.appendChild(row);
-    }
-
-    function calculateAdvice() {
-      const income = parseFloat(document.getElementById('income').value) || 0;
-      const goal = parseFloat(document.getElementById('goal').value) || 0;
-      const months = parseFloat(document.getElementById('months').value) || 1;
-
-      let totalExpenses = 0;
-      document.querySelectorAll('.expense-item').forEach(row => {
-        const amount = parseFloat(row.children[1].value) || 0;
-        totalExpenses += amount;
-      });
-
-      const profit = income - totalExpenses;
-      const monthsToGoal = goal / profit;
-      const neededPerMonth = goal / months;
-      const shortfall = neededPerMonth - profit;
-
-      let output = `<p><strong>Monthly Profit:</strong> $${profit.toFixed(2)}</p>`;
-      output += `<p><strong>Total Expenses:</strong> $${totalExpenses.toFixed(2)}</p>`;
-
-      if (profit <= 0) {
-        output += `<p>You are spending more than you earn. Try reducing unnecessary expenses.</p>`;
-      } else if (shortfall > 0) {
-        output += `<p>To reach your savings goal of $${goal.toFixed(2)} in ${months} months, you need to save $${neededPerMonth.toFixed(2)}/month.</p>`;
-        output += `<p>You're short by $${shortfall.toFixed(2)} each month. Try reducing spending or increasing income.</p>`;
-      } else {
-        output += `<p>You are on track to meet your goal! 🎉</p>`;
-      }
-
-      // Track savings
-      const savedThisMonth = profit > 0 ? profit : 0;
-      const now = new Date();
-      const monthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
-
-      const currentFinances = JSON.parse(localStorage.getItem('finances')) || { totalSaved: 0, history: {} };
-      currentFinances.totalSaved += savedThisMonth;
-      currentFinances.history[monthKey] = (currentFinances.history[monthKey] || 0) + savedThisMonth;
-
-      localStorage.setItem('finances', JSON.stringify(currentFinances));
-
-      document.getElementById('output').innerHTML = output + `<p>Total saved so far: $${currentFinances.totalSaved.toFixed(2)}</p>`;
-      renderChart(currentFinances.history);
-    }
-
-    function renderChart(history) {
-      const ctx = document.getElementById('savingsChart').getContext('2d');
-      const labels = Object.keys(history);
-      const data = Object.values(history);
-
-      if (window.savingsChart) window.savingsChart.destroy();
-      window.savingsChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Savings by Month',
-            data: data,
-            backgroundColor: '#d4e157'
-          }]
-        },
-        options: {
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
-      });
-    }
-
-    // On load
-    const savedHistory = (JSON.parse(localStorage.getItem('finances')) || {}).history || {};
-    renderChart(savedHistory);
-    addExpenseField();
   </script>
 </body>
 </html>
