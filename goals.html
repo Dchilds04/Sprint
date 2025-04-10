@@ -82,7 +82,7 @@
     if (!localStorage.getItem('currentUser')) window.location.href = 'index.html';
     function logout() { localStorage.removeItem('currentUser'); }
 
-    const goals = JSON.parse(localStorage.getItem('goals')) || [];
+   let goals = JSON.parse(localStorage.getItem('goals')) || [];
     const completed = JSON.parse(localStorage.getItem('completedGoals')) || [];
 
     function saveGoals() {
@@ -90,9 +90,9 @@
     }
 
     function addGoal() {
-      const name = document.getElementById('goalName').value;
-      const target = parseFloat(document.getElementById('goalTarget').value);
-      const saved = parseFloat(document.getElementById('goalSaved').value);
+    const name = document.getElementById('goalName').value;
+    const target = parseFloat(document.getElementById('goalTarget').value);
+    const saved = parseFloat(document.getElementById('goalSaved').value);
       if (!name || isNaN(target) || isNaN(saved) || target <= 0) return;
 
       goals.push({ name, target, saved });
