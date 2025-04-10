@@ -19,7 +19,7 @@
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(212, 225, 87, 0.5);
     }
-    input, button {
+    input, button, label {
       width: 100%;
       margin: 10px 0;
       padding: 10px;
@@ -37,6 +37,21 @@
       padding: 10px;
       border-radius: 5px;
       margin: 10px 0;
+    }
+    .progress-container {
+      background-color: #ccc;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 5px 0;
+    }
+    .progress-bar {
+      height: 20px;
+      background-color: #d4e157;
+      color: #000;
+      text-align: center;
+    }
+    .goal-entry input {
+      margin-top: 5px;
     }
     nav a {
       color: #d4e157;
@@ -57,40 +72,71 @@
   <div class="container">
     <h1>Long-Term Goals</h1>
     <input type="text" id="goalName" placeholder="Goal Name">
-    <input type="number" id="goalProgress" placeholder="Progress % (0-100)">
+    <input type="number" id="goalTarget" placeholder="Goal Target Amount ($)">
+    <input type="number" id="goalSaved" placeholder="Amount Saved So Far ($)">
     <button onclick="addGoal()">Add Goal</button>
     <div id="goalList"></div>
   </div>
 
   <script>
-    if (!localStorage.getItem('currentUser')) {
-      window.location.href = 'index.html';
-    }
-
-    function logout() {
-      localStorage.removeItem('currentUser');
-    }
+    if (!localStorage.getItem('currentUser')) window.location.href = 'index.html';
+    function logout() { localStorage.removeItem('currentUser'); }
 
     const goals = JSON.parse(localStorage.getItem('goals')) || [];
-    updateDisplay();
+    const completed = JSON.parse(localStorage.getItem('completedGoals')) || [];
+
+    function saveGoals() {
+      localStorage.setItem('goals', JSON.stringify(goals));
+    }
 
     function addGoal() {
       const name = document.getElementById('goalName').value;
-      const progress = parseFloat(document.getElementById('goalProgress').value);
-      if (!name || isNaN(progress)) return;
+      const target = parseFloat(document.getElementById('goalTarget').value);
+      const saved = parseFloat(document.getElementById('goalSaved').value);
+      if (!name || isNaN(target) || isNaN(saved) || target <= 0) return;
 
-      goals.push({ name, progress });
-      localStorage.setItem('goals', JSON.stringify(goals));
+      goals.push({ name, target, saved });
+      saveGoals();
       updateDisplay();
     }
 
     function updateDisplay() {
       const list = document.getElementById('goalList');
       list.innerHTML = '<h3>Your Goals</h3>';
-      goals.forEach(g => {
-        list.innerHTML += `<div class='goal-entry'><strong>${g.name}</strong>: ${g.progress}% complete</div>`;
+      goals.forEach((goal, index) => {
+        const percent = Math.min(100, (goal.saved / goal.target) * 100).toFixed(0);
+
+        if (percent == 100 && !completed.includes(goal.name)) {
+          completed.push(goal.name);
+          localStorage.setItem('completedGoals', JSON.stringify(completed));
+        }
+
+        list.innerHTML += `
+          <div class='goal-entry'>
+            <strong>${goal.name}</strong><br>
+            $${goal.saved.toFixed(2)} / $${goal.target.toFixed(2)} (${percent}%)
+            <div class="progress-container">
+              <div class="progress-bar" style="width:${percent}%">${percent}%</div>
+            </div>
+            <input type="number" value="${goal.saved}" placeholder="Update Saved" onchange="updateSaved(${index}, this.value)">
+            <button onclick="deleteGoal(${index})">Remove</button>
+          </div>`;
       });
     }
+
+    function updateSaved(index, value) {
+      goals[index].saved = parseFloat(value);
+      saveGoals();
+      updateDisplay();
+    }
+
+    function deleteGoal(index) {
+      goals.splice(index, 1);
+      saveGoals();
+      updateDisplay();
+    }
+
+    updateDisplay();
   </script>
 </body>
 </html>
