@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Achievements - MoneyMogul</title>
+  <title>Goals - MoneyMogul</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -19,20 +19,37 @@
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(212, 225, 87, 0.5);
     }
-    .achievement {
-      background-color: gold;
-      padding: 10px;
+    input, button {
+      width: 100%;
       margin: 10px 0;
+      padding: 10px;
       border-radius: 5px;
-      color: #000;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
+      border: none;
     }
-    .badge {
-      width: 30px;
-      height: 30px;
-      margin-right: 10px;
+    button {
+      background-color: #d4e157;
+      color: #2d4a2d;
+      font-weight: bold;
+    }
+    .goal-entry {
+      background: #fff;
+      color: #000;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
+    .progress-container {
+      background-color: #ccc;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+    .progress-bar {
+      height: 20px;
+      background-color: #d4e157;
+      text-align: center;
+      color: #000;
+      font-size: 14px;
     }
     nav a {
       color: #d4e157;
@@ -51,8 +68,11 @@
   </nav>
 
   <div class="container">
-    <h1>Achievements</h1>
-    <div id="achievementList"></div>
+    <h1>Long-Term Goals</h1>
+    <input type="text" id="goalName" placeholder="Goal Name">
+    <input type="number" id="goalProgress" placeholder="Progress % (0-100)">
+    <button onclick="addGoal()">Add Goal</button>
+    <div id="goalList"></div>
   </div>
 
   <script>
@@ -65,26 +85,29 @@
     }
 
     const goals = JSON.parse(localStorage.getItem('goals')) || [];
-    const finances = JSON.parse(localStorage.getItem('finances')) || {};
-    const achievements = [];
-    const completeGoals = goals.filter(g => g.progress >= 100);
+    updateDisplay();
 
-    // Goal-based achievements
-    if (completeGoals.length >= 1) achievements.push({ text: "🏆 First Goal Achieved!", badge: "https://img.icons8.com/emoji/48/trophy-emoji.png" });
-    if (completeGoals.length >= 3) achievements.push({ text: "🎯 Triple Goal Master!", badge: "https://img.icons8.com/emoji/48/check-mark-emoji.png" });
-    if (goals.length >= 5) achievements.push({ text: "📘 Long-Term Visionary", badge: "https://img.icons8.com/emoji/48/star-emoji.png" });
+    function addGoal() {
+      const name = document.getElementById('goalName').value;
+      const progress = parseFloat(document.getElementById('goalProgress').value);
+      if (!name || isNaN(progress)) return;
 
-    // Finance-based achievements
-    if (finances.totalSaved >= 500) achievements.push({ text: "💵 Saved $500!", badge: "https://img.icons8.com/color/48/money.png" });
-    if (finances.totalSaved >= 1000) achievements.push({ text: "💰 Saved $1,000!", badge: "https://img.icons8.com/color/48/banknotes.png" });
-    if (finances.totalSaved >= 5000) achievements.push({ text: "🏦 Saved $5,000!", badge: "https://img.icons8.com/color/48/safe.png" });
+      goals.push({ name, progress });
+      localStorage.setItem('goals', JSON.stringify(goals));
+      updateDisplay();
+    }
 
-    const list = document.getElementById('achievementList');
-    if (achievements.length === 0) {
-      list.innerHTML = '<p>No achievements yet. Keep working toward your goals!</p>';
-    } else {
-      achievements.forEach(a => {
-        list.innerHTML += `<div class='achievement'><img class='badge' src='${a.badge}' alt='badge'>${a.text}</div>`;
+    function updateDisplay() {
+      const list = document.getElementById('goalList');
+      list.innerHTML = '<h3>Your Goals</h3>';
+      goals.forEach(g => {
+        list.innerHTML += `
+          <div class='goal-entry'>
+            <strong>${g.name}</strong>: ${g.progress}% complete
+            <div class="progress-container">
+              <div class="progress-bar" style="width:${g.progress}%">${g.progress}%</div>
+            </div>
+          </div>`;
       });
     }
   </script>
