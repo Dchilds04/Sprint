@@ -114,7 +114,7 @@
         list.innerHTML += `
           <div class='goal-entry'>
             <strong>${goal.name}</strong><br>
-            $${(goal.saved || 0).toFixed(2)} / $${(goal.target || 0).toFixed(2)} (${percent}%)
+            $${(goal.saved ?? 0).toFixed(2)} / $${(goal.target ?? 1).toFixed(2)} (${percent}%)
             <div class="progress-container">
               <div class="progress-bar" style="width:${percent}%">${percent}%</div>
             </div>
