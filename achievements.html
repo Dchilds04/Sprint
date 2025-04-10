@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Goals - MoneyMogul</title>
+  <title>Dashboard - MoneyMogul</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -31,31 +32,24 @@
       color: #2d4a2d;
       font-weight: bold;
     }
-    .goal-entry {
-      background: #fff;
-      color: #000;
-      padding: 10px;
-      border-radius: 5px;
-      margin: 10px 0;
-    }
-    .progress-container {
-      background-color: #ccc;
-      border-radius: 5px;
-      overflow: hidden;
-      margin-top: 5px;
-    }
-    .progress-bar {
-      height: 20px;
-      background-color: #d4e157;
-      text-align: center;
-      color: #000;
-      font-size: 14px;
-    }
     nav a {
       color: #d4e157;
       margin-right: 15px;
       text-decoration: none;
       font-weight: bold;
+    }
+    .expense-item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .expense-item input {
+      flex: 1;
+    }
+    canvas {
+      background-color: #fff;
+      border-radius: 10px;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -68,11 +62,17 @@
   </nav>
 
   <div class="container">
-    <h1>Long-Term Goals</h1>
-    <input type="text" id="goalName" placeholder="Goal Name">
-    <input type="number" id="goalProgress" placeholder="Progress % (0-100)">
-    <button onclick="addGoal()">Add Goal</button>
-    <div id="goalList"></div>
+    <h1>Monthly Financial Tracker</h1>
+    <input type="number" id="income" placeholder="Monthly Income">
+
+    <div id="expenseList"></div>
+    <button onclick="addExpenseField()">+ Add Expense</button>
+
+    <input type="number" id="goal" placeholder="Savings Goal">
+    <input type="number" id="months" placeholder="Target Time (months)">
+    <button onclick="calculateAdvice()">Get Advice</button>
+    <div id="output"></div>
+    <canvas id="savingsChart" width="400" height="200"></canvas>
   </div>
 
   <script>
@@ -84,32 +84,88 @@
       localStorage.removeItem('currentUser');
     }
 
-    const goals = JSON.parse(localStorage.getItem('goals')) || [];
-    updateDisplay();
-
-    function addGoal() {
-      const name = document.getElementById('goalName').value;
-      const progress = parseFloat(document.getElementById('goalProgress').value);
-      if (!name || isNaN(progress)) return;
-
-      goals.push({ name, progress });
-      localStorage.setItem('goals', JSON.stringify(goals));
-      updateDisplay();
+    function addExpenseField() {
+      const container = document.getElementById("expenseList");
+      const row = document.createElement("div");
+      row.classList.add("expense-item");
+      row.innerHTML = `
+        <input type="text" placeholder="Expense Name">
+        <input type="number" placeholder="Amount">
+      `;
+      container.appendChild(row);
     }
 
-    function updateDisplay() {
-      const list = document.getElementById('goalList');
-      list.innerHTML = '<h3>Your Goals</h3>';
-      goals.forEach(g => {
-        list.innerHTML += `
-          <div class='goal-entry'>
-            <strong>${g.name}</strong>: ${g.progress}% complete
-            <div class="progress-container">
-              <div class="progress-bar" style="width:${g.progress}%">${g.progress}%</div>
-            </div>
-          </div>`;
+    function calculateAdvice() {
+      const income = parseFloat(document.getElementById('income').value) || 0;
+      const goal = parseFloat(document.getElementById('goal').value) || 0;
+      const months = parseFloat(document.getElementById('months').value) || 1;
+
+      let totalExpenses = 0;
+      document.querySelectorAll('.expense-item').forEach(row => {
+        const amount = parseFloat(row.children[1].value) || 0;
+        totalExpenses += amount;
+      });
+
+      const profit = income - totalExpenses;
+      const monthsToGoal = goal / profit;
+      const neededPerMonth = goal / months;
+      const shortfall = neededPerMonth - profit;
+
+      let output = `<p><strong>Monthly Profit:</strong> $${profit.toFixed(2)}</p>`;
+      output += `<p><strong>Total Expenses:</strong> $${totalExpenses.toFixed(2)}</p>`;
+
+      if (profit <= 0) {
+        output += `<p>You are spending more than you earn. Try reducing unnecessary expenses.</p>`;
+      } else if (shortfall > 0) {
+        output += `<p>To reach your savings goal of $${goal.toFixed(2)} in ${months} months, you need to save $${neededPerMonth.toFixed(2)}/month.</p>`;
+        output += `<p>You're short by $${shortfall.toFixed(2)} each month. Try reducing spending or increasing income.</p>`;
+      } else {
+        output += `<p>You are on track to meet your goal! 🎉</p>`;
+      }
+
+      // Track savings
+      const savedThisMonth = profit > 0 ? profit : 0;
+      const now = new Date();
+      const monthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
+
+      const currentFinances = JSON.parse(localStorage.getItem('finances')) || { totalSaved: 0, history: {} };
+      currentFinances.totalSaved += savedThisMonth;
+      currentFinances.history[monthKey] = (currentFinances.history[monthKey] || 0) + savedThisMonth;
+
+      localStorage.setItem('finances', JSON.stringify(currentFinances));
+
+      document.getElementById('output').innerHTML = output + `<p>Total saved so far: $${currentFinances.totalSaved.toFixed(2)}</p>`;
+      renderChart(currentFinances.history);
+    }
+
+    function renderChart(history) {
+      const ctx = document.getElementById('savingsChart').getContext('2d');
+      const labels = Object.keys(history);
+      const data = Object.values(history);
+
+      if (window.savingsChart) window.savingsChart.destroy();
+      window.savingsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Savings by Month',
+            data: data,
+            backgroundColor: '#d4e157'
+          }]
+        },
+        options: {
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
       });
     }
+
+    // On load
+    const savedHistory = (JSON.parse(localStorage.getItem('finances')) || {}).history || {};
+    renderChart(savedHistory);
+    addExpenseField();
   </script>
 </body>
 </html>
