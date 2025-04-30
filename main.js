@@ -1,4 +1,5 @@
-const apiUrl = "https://money-mogul-api.onrender.com"; // ← No trailing slash
+const apiUrl = "https://sprint-nn2e.onrender.com";      // ✅ NEW
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const path = window.location.pathname;
