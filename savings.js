@@ -29,7 +29,7 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const token = localStorage.getItem("token");
   const goal = document.getElementById("goal").value;
-  const amount = document.getElementById("amount").value;
+  const amount = parseFloat(document.getElementById("amount").value);
   const date = document.getElementById("date").value;
 
   await fetch(`${apiUrl}/savings`, {
@@ -54,13 +54,16 @@ async function loadSavings() {
   });
   const savings = await res.json();
 
-  const dataByGoal = {};
+  const goalTotals = {};
   savings.forEach(s => {
-    dataByGoal[s.goal] = (dataByGoal[s.goal] || 0) + parseFloat(s.amount);
+    if (!goalTotals[s.goal]) {
+      goalTotals[s.goal] = 0;
+    }
+    goalTotals[s.goal] += parseFloat(s.amount);
   });
 
-  const labels = Object.keys(dataByGoal);
-  const data = labels.map(l => dataByGoal[l]);
+  const labels = Object.keys(goalTotals);
+  const data = labels.map(label => goalTotals[label]);
 
   if (chart) chart.destroy();
   chart = new Chart(ctx, {
@@ -68,7 +71,7 @@ async function loadSavings() {
     data: {
       labels,
       datasets: [{
-        label: 'Savings Breakdown',
+        label: 'Savings Goal Progress',
         data,
         backgroundColor: [
           '#4caf50', '#ffeb3b', '#ff9800', '#2196f3', '#9c27b0', '#f44336'

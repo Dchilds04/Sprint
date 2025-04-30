@@ -1,70 +1,22 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Profile - MoneyMogul</title>
   <link rel="stylesheet" href="styles.css">
-  <style>
-    body {
-      background-color: #003300;
-      color: #FFD700;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    nav {
-      background-color: #1b5e20;
-      padding: 10px;
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-    }
-    nav a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-    }
-    h2, h3 {
-      border-bottom: 1px solid #FFD700;
-      padding-bottom: 5px;
-    }
-    ul {
-      list-style-type: none;
-      padding-left: 0;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #1b5e20;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #2e7d32;
-    }
-  </style>
 </head>
 <body>
-    <header>
-        <div class="brand">MoneyMogul</div>
-        <nav>
-          <a href="expenses.html">Expenses</a>
-          <a href="savings.html">Savings</a>
-          <a href="profile.html">Profile</a>
-          <a href="#" onclick="logout()">Logout</a>
-        </nav>
-      </header>
-      
+  <header>
+    <div class="brand">MoneyMogul</div>
+    <nav>
+      <a href="expenses.html">Expenses</a>
+      <a href="savings.html">Savings</a>
+      <a href="profile.html">Profile</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </nav>
+  </header>
 
-  <div class="container">
+  <div class="container profile">
     <h2>Profile</h2>
     <p id="username-display"></p>
     <p>Total Expenses: <span id="total-expenses"></span></p>
