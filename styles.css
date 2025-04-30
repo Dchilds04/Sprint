@@ -1,0 +1,18 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 2em auto;
+    padding: 0 1em;
+  }
+  form { margin-bottom: 1em; }
+  input, button { padding: 0.5em; margin-right: 0.5em; }
+  #logout-btn { float: right; }
+  canvas { max-width: 100%; margin-top: 2em; }
+  ul { list-style: none; padding: 0; }
+  #achievements-list li {
+    background: #f9f9f9;
+    margin: 0.5em 0;
+    padding: 0.5em;
+    border-radius: 4px;
+  }
+  
