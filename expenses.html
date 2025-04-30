@@ -1,5 +1,3 @@
-<!-- expenses.html -->
-
 const apiUrl = "https://sprint-nn2e.onrender.com";
 
 <!DOCTYPE html>
@@ -9,17 +7,65 @@ const apiUrl = "https://sprint-nn2e.onrender.com";
   <title>Expenses - MoneyMogul</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background-color: #003300;
+      color: #FFD700;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    nav {
+      background-color: #1b5e20;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+    form input, form select, form button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+    #month-display {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 10px;
+    }
+    canvas {
+      margin-top: 30px;
+      width: 100%;
+      max-height: 400px;
+    }
+  </style>
 </head>
 <body>
-  <div class="nav">
-    <button onclick="changeMonth(-1)">&larr;</button>
-    <span id="month-display"></span>
-    <button onclick="changeMonth(1)">&rarr;</button>
-  </div>
-  <div class="expense-form">
-    <h2>Add Expense</h2>
+  <nav>
+    <a href="expenses.html">Expenses</a>
+    <a href="profile.html">Profile</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </nav>
+
+  <div class="container">
+    <h2>Monthly Expenses</h2>
+    <div>
+      <button onclick="changeMonth(-1)">←</button>
+      <span id="month-display"></span>
+      <button onclick="changeMonth(1)">→</button>
+    </div>
+
     <form id="expense-form">
-      <input type="text" id="name" placeholder="Name" required>
+      <input type="text" id="name" placeholder="Expense name" required>
       <input type="number" id="amount" placeholder="Amount" required>
       <select id="category" required>
         <option value="Food">Food</option>
@@ -29,10 +75,12 @@ const apiUrl = "https://sprint-nn2e.onrender.com";
         <option value="Other">Other</option>
       </select>
       <input type="date" id="date" required>
-      <button type="submit">Add</button>
+      <button type="submit">Add Expense</button>
     </form>
+
+    <canvas id="expense-chart"></canvas>
   </div>
-  <canvas id="expense-chart"></canvas>
+
   <script src="expenses.js"></script>
 </body>
 </html>
