@@ -52,4 +52,42 @@ body {
     color: #FFD700;
     text-decoration: underline;
   }
+
+  .nav {
+    text-align: center;
+    margin: 20px;
+    font-size: 1.2em;
+  }
+  .expense-form, .profile {
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+    background-color: #e0f2e9;
+    border-radius: 10px;
+  }
+  .expense-form input, select, button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 8px;
+  }
+  canvas {
+    max-width: 600px;
+    margin: auto;
+    display: block;
+  }
+  button {
+    background-color: #1b5e20;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  button:hover {
+    background-color: #2e7d32;
+  }
+
+
+  
+  
   
