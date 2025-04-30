@@ -1,4 +1,4 @@
-const apiUrl = "https://your-render-url.onrender.com"; // update to your Render URL
+const apiUrl = "https://money-mogul-api.onrender.com"; // ← No trailing slash
 
 document.addEventListener("DOMContentLoaded", () => {
   const path = window.location.pathname;
