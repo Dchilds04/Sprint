@@ -56,7 +56,7 @@ async function loadSavings() {
 
   const dataByGoal = {};
   savings.forEach(s => {
-    dataByGoal[s.goal] = (dataByGoal[s.goal] || 0) + s.amount;
+    dataByGoal[s.goal] = (dataByGoal[s.goal] || 0) + parseFloat(s.amount);
   });
 
   const labels = Object.keys(dataByGoal);
